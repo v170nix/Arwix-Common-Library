@@ -1,2 +1,2 @@
 include ':lib'
-rootProject.name='Common Library'
+rootProject.name='Arwix Common Library'
