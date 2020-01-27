@@ -2,7 +2,9 @@ package net.arwix.extension
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.os.Build
+import android.util.TypedValue
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
@@ -42,3 +44,13 @@ fun TextView.setTextAppearanceCompat(resId: Int) {
         this.setTextAppearance(this.context, resId)
     }
 }
+
+fun View.toSp(spValue: Float) =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, spValue, this.resources.displayMetrics)
+
+fun View.toDp(dpValue: Float) =
+    TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, this.resources.displayMetrics)
+
+fun View.toSp(spValue: Int) = toSp(spValue.toFloat())
+
+fun View.toDp(dpValue: Int) = toDp(dpValue.toFloat())
