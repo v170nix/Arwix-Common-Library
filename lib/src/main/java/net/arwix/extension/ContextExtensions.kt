@@ -12,3 +12,10 @@ fun Context.getThemeColor(@AttrRes attr: Int) = TypedValue().also {
 
 fun Context.getString(identifierKey: String): String =
     this.getString(resources.getIdentifier(identifierKey, "string", packageName))
+
+fun Context.resolveAttribute(@AttrRes attributeResId: Int): Int {
+    val typedValue = TypedValue()
+    if (theme.resolveAttribute(attributeResId, typedValue, true))
+        return typedValue.data
+    throw IllegalArgumentException(resources.getResourceName(attributeResId))
+}
