@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+@Deprecated("Use State View Model")
 abstract class SimpleIntentViewModel<ACTION, RESULT, STATE> : ViewModel() {
 
     protected abstract var internalViewState: STATE
