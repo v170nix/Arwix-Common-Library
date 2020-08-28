@@ -28,7 +28,7 @@ abstract class StateViewModel<A : StateViewModel.Action, R, S> : ViewModel() {
         .consumeAsFlow()
         .transform { this.emitAll(dispatchAction(it)) }
 
-    private val resultFlow: Flow<R> = resultChannel.consumeAsFlow()
+//    private val resultFlow: Flow<R> = resultChannel.consumeAsFlow()
 
     private val actionToResultFlow: Flow<R> = channelFlow {
         launch(coroutineContext + SupervisorJob()) {

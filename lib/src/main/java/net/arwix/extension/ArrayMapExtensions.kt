@@ -1,7 +1,10 @@
 package net.arwix.extension
 
+import androidx.annotation.RestrictTo
 import androidx.collection.ArrayMap
+import androidx.collection.SparseArrayCompat
 import androidx.collection.arrayMapOf
+import androidx.collection.forEach
 
 
 fun <K, V> Map<K, V>.toArrayMap() = ArrayMap<K, V>(this.size).let {
@@ -57,4 +60,16 @@ public fun <K, V> Array<out Pair<K, V>>.toArrayMap(): ArrayMap<K, V> = when (siz
     0 -> arrayMapOf()
     1 -> arrayMapOf(this[0])
     else -> toMap(ArrayMap(size))
+}
+
+/**
+ * Transform [SparseArrayCompat<E>][SparseArrayCompat] to [Map<Int,E>][Map]
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <E> SparseArrayCompat<E>.asMap(): Map<Int, E> {
+    val map = HashMap<Int, E>()
+    forEach { key, value ->
+        map[key] = value
+    }
+    return map
 }
