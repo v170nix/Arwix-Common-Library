@@ -92,21 +92,21 @@ abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
 
     enum class ActionType { Latest, Merge, Sync }
 
-    abstract class Action {
-        abstract val type: ActionType
+    interface Action {
+        val type: ActionType
     }
 
-    open class LatestAction : Action() {
+    interface LatestAction : Action {
         override val type: ActionType
             get() = ActionType.Latest
     }
 
-    open class MergeAction : Action() {
+    interface MergeAction : Action {
         override val type: ActionType
             get() = ActionType.Merge
     }
 
-    open class SyncAction : Action() {
+    interface SyncAction : Action {
         override val type: ActionType
             get() = ActionType.Sync
     }
