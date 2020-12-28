@@ -61,12 +61,12 @@ fun Context.createNotificationChannel(id: String, createChannel: (id: String) ->
     ]
 )
 @Retention(AnnotationRetention.SOURCE)
-annotation class PengingIntentFlags
+annotation class PendingIntentFlags
 
 fun Context.activityPendingIntent(
     requestCode: Int,
     intent: Intent,
-    @PengingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
+    @PendingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
     options: Bundle? = null
 ): PendingIntent {
     return PendingIntent.getActivity(this, requestCode, intent, flags, options)
@@ -75,7 +75,7 @@ fun Context.activityPendingIntent(
 fun Context.activityPendingIntent(
     requestCode: Int,
     activityClass: Class<out Activity>,
-    @PengingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
+    @PendingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
     options: Bundle? = null
 ): PendingIntent {
     return activityPendingIntent(requestCode, Intent(this, activityClass), flags, options)
@@ -84,7 +84,7 @@ fun Context.activityPendingIntent(
 fun Context.activityPendingIntent(
     requestCode: Int,
     activityClass: KClass<out Activity>,
-    @PengingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
+    @PendingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
     options: Bundle? = null
 ): PendingIntent {
     return activityPendingIntent(requestCode, activityClass.java, flags, options)
@@ -92,7 +92,7 @@ fun Context.activityPendingIntent(
 
 inline fun <reified T : Activity> Context.activityPendingIntent(
     requestCode: Int,
-    @PengingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
+    @PendingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
     options: Bundle? = null
 ): PendingIntent {
     return activityPendingIntent(requestCode, T::class, flags, options)
@@ -101,7 +101,7 @@ inline fun <reified T : Activity> Context.activityPendingIntent(
 fun Context.activitiesPendingIntent(
     requestCode: Int,
     intents: Array<Intent>,
-    @PengingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
+    @PendingIntentFlags flags: Int = PendingIntent.FLAG_CANCEL_CURRENT,
     options: Bundle? = null
 ): PendingIntent {
     return PendingIntent.getActivities(this, requestCode, intents, flags, options)
