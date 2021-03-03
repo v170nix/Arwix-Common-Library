@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.arwix.extension.tryOffer
 
 abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
     initState: S,
@@ -73,21 +74,21 @@ abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
             .launchIn(viewModelScope)
     }
 
-    protected fun nextResult(result: R) = resultChannel.offer(result)
+    protected fun onResult(result: R) = resultChannel.tryOffer(result)
 
-    fun nextSyncAction(action: A): Boolean {
+    fun onSyncAction(action: A): Boolean {
         if (action.type != ActionType.Sync) throw IllegalStateException()
-        return concatActionChannel.offer(action)
+        return concatActionChannel.tryOffer(action)
     }
 
-    fun nextLatestAction(action: A): Boolean {
+    fun onLatestAction(action: A): Boolean {
         if (action.type != ActionType.Latest) throw IllegalStateException()
-        return latestActionChannel.offer(action)
+        return latestActionChannel.tryOffer(action)
     }
 
-    fun nextMergeAction(action: A): Boolean {
+    fun onMergeAction(action: A): Boolean {
         if (action.type != ActionType.Merge) throw IllegalStateException()
-        return mergeActionChannel.offer(action)
+        return mergeActionChannel.tryOffer(action)
     }
 
     enum class ActionType { Latest, Merge, Sync }
