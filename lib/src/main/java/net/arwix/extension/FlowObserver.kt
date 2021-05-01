@@ -5,7 +5,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @PublishedApi
@@ -19,12 +18,14 @@ internal class ObserverImpl<T>(
 
     override fun onStart(owner: LifecycleOwner) {
         job = owner.lifecycleScope.launch {
-            flow.collect { collector(it) }
+            flow.safeCollect {
+                collector(it)
+            }
         }
     }
 
     override fun onStop(owner: LifecycleOwner) {
-        job?.cancel()
+        if (job?.isActive == true) job?.cancel()
         job = null
     }
 

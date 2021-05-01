@@ -2,16 +2,22 @@
 
 package net.arwix.extension
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
 fun <E> SendChannel<E>.tryOffer(element: E): Boolean {
-    return runCatching { offer(element) }.getOrDefault(false)
+    return runCatching {
+        offer(element)
+    }.getOrDefault(false)
 }
 
 fun <E> SendChannel<E>.trySendBlocking(element: E) {
@@ -21,7 +27,19 @@ fun <E> SendChannel<E>.trySendBlocking(element: E) {
     }
 }
 
-fun <T, V> Flow<T>.mapDistinct(mapper: suspend (T) -> V): Flow<V> = map(mapper).distinctUntilChanged()
+suspend inline fun <T> Flow<T>.safeCollect(crossinline action: suspend (value: T) -> Unit): Unit =
+    collect {
+        try {
+            action(it)
+        } catch (e: CancellationException) { }
+    }
+
+fun <T> Flow<T>.safeLaunchIn(scope: CoroutineScope) = scope.launch {
+    this@safeLaunchIn.safeCollect {  }
+}
+
+fun <T, V> Flow<T>.mapDistinct(mapper: suspend (T) -> V): Flow<V> =
+    map(mapper).distinctUntilChanged()
 
 /**
  * Job container that will cancel the previous job if a new one is set.
@@ -43,7 +61,7 @@ class ConflatedJob {
     }
 
     fun cancel() {
-        job?.cancel()
+        if (job?.isActive == true) job?.cancel()
         prevJob = job
     }
 

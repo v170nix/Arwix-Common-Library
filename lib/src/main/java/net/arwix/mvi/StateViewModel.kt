@@ -9,6 +9,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
+import net.arwix.extension.safeCollect
+import net.arwix.extension.safeLaunchIn
 import java.util.concurrent.Executors
 
 abstract class StateViewModel<A : StateViewModel.Action, R, S> : ViewModel() {
@@ -35,20 +37,20 @@ abstract class StateViewModel<A : StateViewModel.Action, R, S> : ViewModel() {
             latestActionChannel
                 .consumeAsFlow()
                 .flatMapLatest { dispatchAction(it) }
-                .collect(::send)
+                .safeCollect(::send)
         }
         launch(coroutineContext + SupervisorJob()) {
             mergeActionChannel
                 .consumeAsFlow()
                 .flatMapMerge { dispatchAction(it) }
-                .collect(::send)
+                .safeCollect(::send)
         }
 
         launch(coroutineContext + SupervisorJob()) {
-            concatResultFlow.collect(::send)
+            concatResultFlow.safeCollect(::send)
         }
         launch(coroutineContext + SupervisorJob()) {
-            resultChannel.consumeAsFlow().collect(::send)
+            resultChannel.consumeAsFlow().safeCollect(::send)
         }
         awaitClose {
             concatActionChannel.close()
@@ -74,7 +76,7 @@ abstract class StateViewModel<A : StateViewModel.Action, R, S> : ViewModel() {
             .onStart { internalViewState }
             .distinctUntilChanged()
             .flowOn(fetchDispatcher)
-            .launchIn(viewModelScope)
+            .safeLaunchIn(viewModelScope)
     }
 
     protected fun nextAction(action: A) {

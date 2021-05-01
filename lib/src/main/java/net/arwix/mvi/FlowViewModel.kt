@@ -11,6 +11,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import net.arwix.extension.safeCollect
+import net.arwix.extension.safeLaunchIn
 import net.arwix.extension.tryOffer
 
 abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
@@ -32,23 +34,23 @@ abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
             latestActionChannel
                 .consumeAsFlow()
                 .flatMapLatest { dispatchAction(it) }
-                .collect(this@channelFlow::send)
+                .safeCollect(this@channelFlow::send)
         }
         launch(coroutineContext + SupervisorJob()) {
             mergeActionChannel
                 .consumeAsFlow()
                 .flatMapMerge { dispatchAction(it) }
-                .collect(this@channelFlow::send)
+                .safeCollect(this@channelFlow::send)
         }
 
         launch(coroutineContext + SupervisorJob()) {
             concatActionChannel
                 .consumeAsFlow()
                 .transform { this.emitAll(dispatchAction(it)) }
-                .collect(this@channelFlow::send)
+                .safeCollect(this@channelFlow::send)
         }
         launch(coroutineContext + SupervisorJob()) {
-            resultChannel.consumeAsFlow().collect(this@channelFlow::send)
+            resultChannel.consumeAsFlow().safeCollect(this@channelFlow::send)
         }
         awaitClose {
             concatActionChannel.close()
@@ -71,7 +73,7 @@ abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
             }
             .catch { e -> errorState.value = e }
             .flowOn(workerDispatcher)
-            .launchIn(viewModelScope)
+            .safeLaunchIn(viewModelScope)
     }
 
     protected fun onResult(result: R) = resultChannel.tryOffer(result)
