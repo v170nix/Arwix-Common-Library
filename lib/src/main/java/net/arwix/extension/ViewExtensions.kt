@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -22,8 +23,37 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
+
+public suspend fun View.awaitOnNextLayout() = suspendCancellableCoroutine<Boolean> {
+    val viewRef = this.weak()
+    val listener =object : View.OnLayoutChangeListener {
+        override fun onLayoutChange(
+            view: View,
+            left: Int,
+            top: Int,
+            right: Int,
+            bottom: Int,
+            oldLeft: Int,
+            oldTop: Int,
+            oldRight: Int,
+            oldBottom: Int
+        ) {
+            view.removeOnLayoutChangeListener(this)
+            it.resume(true)
+        }
+    }
+    addOnLayoutChangeListener(listener)
+    it.invokeOnCancellation { viewRef.runWeak { removeOnLayoutChangeListener(listener) } }
+}
+
+public suspend fun View.awaitOnLayout() {
+    if (ViewCompat.isLaidOut(this) && !isLayoutRequested) return
+    this.awaitOnNextLayout()
+}
 
 fun <T : View> T.visible(): T {
     visibility = View.VISIBLE
