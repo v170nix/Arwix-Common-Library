@@ -4,28 +4,26 @@ package net.arwix.extension
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.coroutineContext
 
-fun <E> SendChannel<E>.tryOffer(element: E): Boolean {
-    return runCatching {
-        offer(element)
-    }.getOrDefault(false)
-}
+//fun <E> SendChannel<E>.tryOffer(element: E): Boolean {
+//    return runCatching {
+//        offer(element)
+//    }.getOrDefault(false)
+//}
 
-fun <E> SendChannel<E>.trySendBlocking(element: E) {
-    if (tryOffer(element)) return
-    runBlocking {
-        send(element)
-    }
-}
+//fun <E> SendChannel<E>.trySendBlocking(element: E) {
+//    if (tryOffer(element)) return
+//    runBlocking {
+//        send(element)
+//    }
+//}
 
 suspend inline fun <T> Flow<T>.safeCollect(crossinline action: suspend (value: T) -> Unit): Unit =
     collect {

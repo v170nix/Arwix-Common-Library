@@ -55,7 +55,7 @@ abstract class SimpleIntentViewModel<ACTION, RESULT, STATE> : ViewModel() {
 
     @UiThread
     fun intent(action: ACTION) {
-        nextAction.value = action
+        nextAction.value = action!!
     }
 
 }

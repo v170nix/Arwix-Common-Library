@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import net.arwix.extension.safeCollect
 import net.arwix.extension.safeLaunchIn
-import net.arwix.extension.tryOffer
 
 abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
     initState: S,
@@ -76,21 +75,21 @@ abstract class FlowViewModel<A : FlowViewModel.Action, R, S>(
             .safeLaunchIn(viewModelScope)
     }
 
-    protected fun onResult(result: R) = resultChannel.tryOffer(result)
+    protected fun onResult(result: R) = resultChannel.trySend(result).isSuccess
 
     fun onSyncAction(action: A): Boolean {
         if (action.type != ActionType.Sync) throw IllegalStateException()
-        return concatActionChannel.tryOffer(action)
+        return concatActionChannel.trySend(action).isSuccess
     }
 
     fun onLatestAction(action: A): Boolean {
         if (action.type != ActionType.Latest) throw IllegalStateException()
-        return latestActionChannel.tryOffer(action)
+        return latestActionChannel.trySend(action).isSuccess
     }
 
     fun onMergeAction(action: A): Boolean {
         if (action.type != ActionType.Merge) throw IllegalStateException()
-        return mergeActionChannel.tryOffer(action)
+        return mergeActionChannel.trySend(action).isSuccess
     }
 
     enum class ActionType { Latest, Merge, Sync }

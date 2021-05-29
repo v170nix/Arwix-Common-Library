@@ -187,7 +187,7 @@ class NotificationDsl @PublishedApi internal constructor(
     inline var extras: Bundle
         get() = builder.extras
         set(value) {
-            builder.extras = value
+            builder.setExtras(value)
         }
 
     /**
