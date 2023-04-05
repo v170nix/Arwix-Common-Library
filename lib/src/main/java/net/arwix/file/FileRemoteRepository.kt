@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.arwix.file
 
 import android.content.Context
@@ -12,7 +14,7 @@ import java.io.File
 class FileRemoteRepository(
     private val context: Context,
     private val pathname: String,
-    private val downloadFile: DownloadFile
+    private val remoteFileMediator: RemoteFileMediator
     ) {
 
     suspend fun getFileOrDownload(key: String, url: String, force: Boolean): Flow<FileNetEvent> {
@@ -22,7 +24,7 @@ class FileRemoteRepository(
                 return flow { emit(fileEvent) }
             }
         }
-        return downloadFile(context, url).transform {
+        return remoteFileMediator(context, url).transform {
             when (it) {
                 is DownloadEvent.OnComplete -> {
                     val file = File(pathname, key)
@@ -51,6 +53,7 @@ class FileRemoteRepository(
         }
     }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     suspend fun getFile(key: String) = flow {
         val file = File(pathname, key)
         if (!file.exists()) {

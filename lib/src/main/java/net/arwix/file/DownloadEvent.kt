@@ -1,7 +1,5 @@
 package net.arwix.file
 
-import android.content.Context
-import kotlinx.coroutines.flow.Flow
 import java.io.File
 
 sealed class DownloadEvent {
@@ -21,6 +19,3 @@ sealed class DownloadEvent {
     }
 }
 
-fun interface DownloadFile {
-   operator fun invoke(context: Context, url: String): Flow<DownloadEvent>
-}
